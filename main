@@ -1,0 +1,378 @@
+import math
+from prettytable import PrettyTable
+
+class Line2d:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.slope = None
+        self.constant = None
+
+    def guide(self):
+
+        lines2d = PrettyTable(["Action", "Command"])
+        lines2d.add_row(["Slope for given line", "self.slope\n"])
+        lines2d.add_row(["Equation of line in 2d", "self.equation()\n"])
+        lines2d.add_row(["General equation of line ", "self.general_equation_line()\n"])
+
+        print(lines2d)
+
+    def slp(self, other):
+        self.slope = (self.y - other.y) / (self.x - other.x)
+
+    def equation(self):
+        self.constant = self.y - self.slope * self.x
+        if self.constant >= 0:
+            print(f"y={self.slope}x+{self.constant}")
+        else:
+            print(f"y={self.slope}x{self.constant}")
+        print(f"slope: {self.slope}")
+
+    # formula section
+    def general_equation_line(self):
+        print('''
+                    Equation:
+                                y=mx+c,         (m=slope,c=constant)''')
+
+
+class Line3d:
+    def __init__(self, px, py, pz, lx=None, ly=None, lz=None):
+        self.b1xb2 = None
+        self.mod_b1xb2 = None
+        self.lx = None
+        self.ly = None
+        self.lz = None
+        self.px = px
+        self.py = py
+        self.pz = pz
+        self.lx = lx
+        self.ly = ly
+        self.lz = lz
+        self.Q = None
+        self.cosQ = None
+
+    def guide(self):
+
+        lines3d = PrettyTable(["Action", "Command"])
+        lines3d.add_row(
+            ["To add line Parameter ", "for point:(2,3,4) and line parameter:(7,8,9)-->Line3d(2,3,4,7,8,9)\n"])
+
+        lines3d.add_row(["Equation of line ", "self.line_equation()\n"])
+        lines3d.add_row(["Equation of line given a line and point", "self.equation_point_and_line()\n"])
+        lines3d.add_row(["equation of line in cartesian form", "self.equation_point_and_line_cartesian()\n"])
+        lines3d.add_row(["equation of line given tow points", "self.equation_two_pts()\n"])
+        lines3d.add_row(["Angle between two lines", "self.angle(other)\n"])
+        lines3d.add_row(["Shortest distance between Two lines ", "self.shortest_distance(other)\n"])
+        lines3d.add_row(["Formula for shortest distance", "self.formula_shortest_distance()\n"])
+        lines3d.add_row(["formula for angle between two lines", "self.formula_angle()\n"])
+        lines3d.add_row(["To get this guide ", "self.guide()"])
+        print(lines3d)
+
+    def formula(self):
+        self.line_equation()
+        self.formula_shortest_distance()
+        self.formula_angle()
+
+    def equation_point_and_line(self):
+        print(f"Equation: (x-{self.px})/{self.lx}=(y-{self.py})/{self.ly}=(z-{self.pz})/{self.lz}")
+
+    def equation_point_and_line_cartesian(self):
+        print(f"Equation: r=({self.px}i+{self.py}j+{self.pz}k)+m({self.lx}i+{self.ly}j+{self.lz}k)")
+
+    def equation_two_pts(self, other):
+        print(
+            f"Equation: r=({self.px}i+{self.py}j+{self.pz}k)+m({self.px - other.px}i+{self.py - other.py}j+{self.pz - other.pz}k)")
+
+    def angle(self, other):
+        self.equation_point_and_line_cartesian()
+        other.equation_point_and_line_cartesian()
+        ask = int(input("Do you want formula(1/0):"))
+        if ask == 1:
+            self.formula_angle()
+        dis1 = pow((pow(self.px, 2) + pow(self.py, 2) + pow(self.pz, 2)), 0.5)
+        dis2 = pow((pow(other.px, 2) + pow(other.py, 2) + pow(other.pz, 2)), 0.5)
+        alt_mul = self.px * other.px + self.py * other.py + self.pz * other.pz
+        self.Q = math.acos(abs(alt_mul / (dis1 * dis2)))
+        self.cosQ = abs(alt_mul / (dis1 * dis2))
+        return f'''
+                    Angle :
+                             cosQ = {self.cosQ}
+                                Q = {self.Q}
+                                '''
+
+    def shortest_distance(self, other):
+        self.equation_point_and_line_cartesian()
+        other.equation_point_and_line_cartesian()
+        ask = int(input("Do you want formula(1/0):"))
+        if ask == 1:
+            self.formula_shortest_distance()
+
+        if (self.lx == other.lx and self.ly == other.ly and self.lz == other.lz) or (
+                other.lx == None and other.ly == None and other.lz == None):
+            self.b1xb2 = pow(pow((((self.py - other.py) * self.lz) - ((self.pz - other.pz) * self.ly)), 2) + pow((
+                    ((self.px - other.px) * self.lz) - ((self.pz - other.pz) * self.lx)), 2) + pow(
+                (((self.px - other.px) * self.ly) - ((self.py - other.py) * self.lx)), 2), 0.5)
+            self.mod_b1xb2 = pow(pow(self.lx, 2) + pow(self.ly, 2) + pow(self.lz, 2), 0.5)
+            return f"Shortest Distance: {self.b1xb2 / self.mod_b1xb2}"
+
+        else:
+            self.b1xb2 = abs(
+                ((self.px - other.px) * (self.ly * other.lz - self.lz * other.ly) - (self.py - other.py) * (
+                        self.lx * other.lz - self.lz * other.lx) + (self.pz - other.pz) * (
+                         self.lx * other.ly - self.ly * other.lx)))
+            self.mod_b1xb2 = pow((pow((self.ly * other.lz - self.lz * other.ly), 2) + pow(
+                (self.lx * other.lz - self.lz * other.lx), 2) + pow((self.lx * other.ly - self.ly * other.lx), 2)), 0.5)
+
+            return f"Shortest Distance: {self.b1xb2 / self.mod_b1xb2}"
+
+    # equation section
+
+    def line_equation(self):
+        print('''
+        Line Equation:-
+                            1.general equation:                    
+                                            r = a + m(b) 
+                            2.cartesian equation:
+                                            x-x1      y-y1     z-z1
+                                        --------- = ------- = -------
+                                             a         b         c        
+                            ''')
+
+    # Formula section
+
+    def formula_shortest_distance(self):
+        print('''
+        Shortest Distance Formula:-
+                                                    ((b1xb2).(a1-a2))
+                             shortest distance  =  ------------------
+                                                        |b1xb2|
+
+                        ''')
+
+    def formula_angle(self):
+        print('''
+        Angle Formula:-          
+                                                      (b1 . b2)
+                                            COSQ  =  -----------
+                                                      |b1| |b2|
+                                                      ''')
+
+
+class Plane:
+    def __init__(self, px, py, pz, d=None):
+        self.d = d
+        self.px = px
+        self.py = py
+        self.pz = pz
+        self.lx = None
+        self.ly = None
+        self.lz = None
+        self.sinQ = None
+        self.cosQ = None
+        self.Q = None
+        self.length = None
+        self.modn = pow((self.px ** 2 + self.py ** 2 + self.pz ** 2), 0.5)
+
+    def guide(self):
+        planes = PrettyTable(["Action", "Command"])
+        planes.add_row(["To add line parameter", "self.line_parameter()"])
+        planes.add_row(["To add vector parameter", "self.vector_parameter()"])
+        planes.add_row(["Equation of plane in normal form", "self.equation_of_plane_in_normal_form()\n"])
+        planes.add_row(["Equation of plane in cartesian form", "self.equation_plane()\n"])
+        planes.add_row(["Equation of plane passing through three points",
+                        "self.plane_passing_through_three_points( other1, other2)\n"])
+        planes.add_row(["Equation of plane passing through intersection of plane",
+                        "equation_of_plane_passing_through_intersection_of_plane( other1, other2)\n"])
+        planes.add_row(["Equation of plane,perpendicular to vector and passing through points ",
+                        "self.equation_of_plane_perpendicular_to_vector_and_passing_through_point(self)\n"])
+        planes.add_row(["Intercept form of equation", "self.intercept_form_equation_of_plane()\n"])
+        planes.add_row(["Direction Cosine", "self.direction_cosine()\n\n"])
+        planes.add_row(["Coplanarity of plane", "self.coplanarity_of_two_lines(self, other)\n"])
+        planes.add_row(
+            ["Foot of perpendicular distance from origin", "self.foot_of_perpendicular_distance_from_origin()\n"])
+        planes.add_row(["Perpendicular distance from given point", "self.distance_from_point( other)\n"])
+        planes.add_row(["Perpendicular distance from origin", "self.distance_from_origin()\n\n"])
+        planes.add_row(["Angle Between Line And Plane", "self.angle_between_line_and_plane( other)\n"])
+        planes.add_row(["Angle between two planes", "self.angle_between_two_planes(self, other)\n\n"])
+        planes.add_row(["Formula for Coplanarity", "self.formula_coplanarity_of_two_lines()\n"])
+        planes.add_row(["Formula for Distance from origin", "self.formula_distance_from_origin()\n"])
+        planes.add_row(["Formula for angle between line and plane ", "self.formula_angle_between_line_and_plane()\n"])
+        planes.add_row(
+            ["Formula for plane passing through three points", "self.formula_plain_passing_through_three_points()\n"])
+        planes.add_row(["Formula for angle between teo plane", "self.formula_angle_between_two_plane()\n\n"])
+
+        planes.add_row(["to show all formula", "self.formula()"])
+        planes.add_row(["To get this guide ", "self.guide()"])
+        print(planes)
+
+    def line_parameter(self, lx, ly, lz):
+        self.lx = lx
+        self.ly = ly
+        self.lz = lz
+
+
+    def equation_of_plane_in_normal_form(self):
+        r = self.modn
+        print(f"Equation of plane in normal form: r.({self.px}/{r})x+({self.py}/{r})y+({self.pz}/{r})z=({self.d})\n")
+
+    def equation_line(self):
+        print(f"Equation: r=({self.px}i+{self.py}j+{self.pz}k)+m({self.lx}i+{self.ly}j+{self.lz}k)", end="\n")
+
+    def equation_plane(self):
+        print(f"Equation of plane in cartesian form: ({self.px})x+({self.py})y+({self.pz})z={self.d}\n")
+
+    def equation_of_plane_passing_through_intersection_of_plane(self, other1, other2):
+        m = -(other1.px * self.px + other1.py * self.py + other1.pz * self.pz - other1.d) / (
+                other2.px * self.px + other2.py * self.py + other2.pz * self.pz - other2.d)
+        px = other1.px + m * other2.px
+        py = other1.py + m * other2.py
+        pz = other1.pz + m * other2.pz
+        d = other1.d + m * other2.d
+        print(f"Equation of plane in cartesian form: ({px})x+({py})y+({pz})z={d}")
+
+    def plane_passing_through_three_points(self, other1, other2):
+        ask = int(input("Do you want formula(1/0):"))
+        if ask == 1:
+            self.formula_plain_passing_through_three_points()
+        a1 = self.px - other1.px
+        a2 = self.py - other1.py
+        a3 = self.pz - other1.pz
+        b1 = self.px - other2.px
+        b2 = self.py - other2.py
+        b3 = self.pz - other2.pz
+        x = a2 * b3 - a3 * b2
+        y = a3 * b1 - a1 * b3
+        z = a1 * b2 - a2 * b1
+        d = x * self.px + y * self.py + z * self.pz
+        print(f"Equation of plane: ({x})x+({y})y+({z})z=({d})")
+
+    def angle_between_two_planes(self, other):
+        self.equation_plane()
+        other.equation_plane()
+        n1_n2 = self.px * other.px + self.py * other.py + self.pz * other.pz
+        n1 = pow((self.px ** 2 + self.py ** 2 + self.pz ** 2), 0.5)
+        n2 = pow((other.px ** 2 + other.py ** 2 + other.pz ** 2), 0.5)
+        self.cosQ = abs(n1_n2 / (n1 * n2))
+        self.Q = math.acos(self.cosQ)
+        ask = int(input("Do you want formula(1/0):"))
+        if ask == 1:
+            self.formula_angle_between_two_plane()
+        return print(f'''
+                            Angle :
+                                     cosQ = {self.cosQ}
+                                        Q = {self.Q}
+                                                ''')
+
+    def coplanarity_of_two_lines(self, other):
+        self.equation_line()
+        other.equation_line()
+        ask = int(input("Do you want formula(1/0):"))
+        if ask == 1:
+            self.formula_coplanarity_of_two_lines()
+        diffx = self.lx - other.lx
+        diffy = self.ly - other.ly
+        diff = self.lz - other.lz
+        det = diffx * (self.py * other.pz - self.pz * other.py) - (
+                diffy * (self.px * other.pz - self.pz * other.px)) + (
+                      diff * (self.px * other.py - self.py * other.px))
+        if det == 0:
+            return print("Lines are coplanar")
+        else:
+            return print("Lines are non-coplanar")
+
+    def equation_of_plain_perpendicular_to_vector_and_passing_through_point(self):
+        self.d = self.px * self.lx + self.py * self.ly + self.pz * self.lz
+        print(f"Equation of plane in cartesian form: ({self.lx})x+({self.ly})y+({self.lz})z={self.d}\n")
+
+    def direction_cosine(self):
+        print(f"({self.px / self.modn},{self.py / self.modn},{self.pz / self.modn})")
+
+    def foot_of_perpendicular_distance_from_origin(self):
+        k = self.d * self.modn / (self.px * self.px + self.py * self.py + self.pz * self.pz)
+        print(
+            f"Foot of perpendicular: ({(self.px * k) / self.modn},{(self.py * k) / self.modn},{(self.pz * k) / self.modn})")
+
+    def intercept_form_equation_of_plane(self, other1, other2):
+        print(f'''Intercept Form:
+                                    x     y     z
+                                   --- + --- + --- = 1
+                                    a     b     c           ''')
+        print(f"Equation in Intercept Form:  x/{self.px}+y/{other1.py}+z/{other2.pz}=1 \n")
+        self.d = self.px * other1.py * other2.pz
+        self.py = self.px * other2.pz
+        self.pz = self.px * other1.py
+        self.px = other1.py * other2.pz
+        self.equation_plane()
+
+    def distance_from_point(self, other):
+        distance = abs(self.px * other.px + self.py * other.py + self.pz * other.pz - self.d) / self.modn
+        self.equation_plane()
+
+        print(f"Perpendicular distance from given point({other.px},{other.py},{other.pz}) is {distance}")
+
+    def distance_from_origin(self):
+        ask = int(input("Do you want formula(1/0):"))
+        if ask == 1:
+            self.formula_distance_from_origin()
+        self.length = abs(self.d) / self.modn
+        return print(f"distance form Origin: {self.length}")
+
+    def angle_between_line_and_plane(self, other):
+        self.equation_plane()
+        other.equation_point_and_line_cartesian()
+        ask = int(input("Do you want formula(1/0):"))
+        if ask == 1:
+            self.formula_angle_between_line_and_plane()
+        b_n = self.px * other.lx + self.py * other.ly + self.pz * other.lz
+        b = pow((other.lx ** 2 + other.ly ** 2 + other.lz ** 2), 0.5)
+        n = pow((self.px ** 2 + self.py ** 2 + self.pz ** 2), 0.5)
+        self.sinQ = abs(b_n / (b * n))
+        self.Q = math.asin(self.sinQ)
+        return print(f'''
+                            Angle :
+                                     sinQ = {self.sinQ}
+                                        Q = {self.Q}
+                                        ''')
+
+    def formula(self):
+        self.formula_coplanarity_of_two_lines()
+        self.formula_distance_from_origin()
+        self.formula_angle_between_line_and_plane()
+        self.formula_angle_between_two_plane()
+        self.formula_plain_passing_through_three_points()
+
+    # formula
+    def formula_coplanarity_of_two_lines(self):
+        print('''Coplanarity_of_two_lines:                       
+                                     (a2-a1).(b1xb2)=0
+                                     ''')
+
+    def formula_distance_from_origin(self):
+        print('''distance from origin:
+                                          abs(d)               
+                                    dis = ------                
+                                           |n|
+                                ''')
+
+    def formula_angle_between_line_and_plane(self):
+        print('''Angle between line and plane:
+                                            |  b. n  |                                                                                           
+                                    sinQ =  |--------|                    
+                                            | |b||n| |  ''')
+
+    def formula_plain_passing_through_three_points(self):
+        print('''Condition for plain passing through three points:
+                                |x-x1   y-y1    z-z1 |
+                                |                    |
+                                |x2-x1  y2-y1   z2-z1| = 0
+                                |                    |
+                                |x3-x1  y3-y1   z3-z1|          \n''')
+
+    def formula_angle_between_two_plane(self):
+        print('''Angle between two plane:
+                                            |  n1 . n2  |                                                                                           
+                                    cosQ =  |-----------|                    
+                                            | |n1| |n2| |  ''')
+
+
+
