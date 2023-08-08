@@ -1,0 +1,5 @@
+import math
+from prettytable import PrettyTable
+
+to install :-
+          pip install prettytable
